@@ -6,4 +6,5 @@ object Contants {
     const val APP_ENTRY = "app_entry"
 
     const val API_KEY = "8bb08ac9ee244b44b6a433b92b2a7d14"
+    const val BASE_URL = "https://newsapi.org/v2/"
 }
