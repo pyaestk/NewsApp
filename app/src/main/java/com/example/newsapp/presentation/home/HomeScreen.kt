@@ -30,7 +30,8 @@ import com.loc.newsapp.presentation.common.SearchBar
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier, articles: LazyPagingItems<Article>, navigate: (String) -> Unit
+    articles: LazyPagingItems<Article>,
+    navigate: (String) -> Unit
 ) {
     val titles by remember {
         derivedStateOf {
@@ -49,7 +50,11 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = Dimens.MediumPadding1)
+            .padding(
+                top = Dimens.MediumPadding1,
+                start = Dimens.MediumPadding1,
+                end = Dimens.MediumPadding1
+            )
             .statusBarsPadding()
     ) {
 
@@ -59,13 +64,11 @@ fun HomeScreen(
             modifier = Modifier
                 .width(150.dp)
                 .height(30.dp)
-                .padding(horizontal = Dimens.MediumPadding1)
         )
 
         Spacer(modifier = Modifier.padding(top = Dimens.MediumPadding1))
 
         SearchBar(
-            modifier = Modifier.padding(horizontal = Dimens.MediumPadding1),
             text = "",
             readOnly = true,
             onValueChange = {},

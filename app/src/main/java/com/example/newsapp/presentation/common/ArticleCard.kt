@@ -46,9 +46,8 @@ fun ArticleCard(
 
     val context = LocalContext.current
     Row(
-        modifier = modifier.clickable { onClick?.invoke() },
-
-        ) {
+        modifier = modifier.clickable {}
+    ) {
         AsyncImage(
             modifier = Modifier
                 .size(ArticleCardSize)
@@ -57,10 +56,11 @@ fun ArticleCard(
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
+
         Column(
-            verticalArrangement = Arrangement.SpaceAround,
+            verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier
-                .padding(horizontal = ExtraSmallPadding)
+                .padding(horizontal = ExtraSmallPadding2)
                 .height(ArticleCardSize)
         ) {
             Text(
@@ -71,16 +71,22 @@ fun ArticleCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+
+
+            Text(
+                modifier = Modifier.padding(horizontal = 6.dp),
+                text = article.source.name,
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = colorResource(id = R.color.body)
+            )
+
+
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = ExtraSmallPadding2)
             ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 6.dp),
-                    text = article.source.name,
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                    color = colorResource(id = R.color.body)
-                )
-                Spacer(modifier = Modifier.width(ExtraSmallPadding2))
+
                 Icon(
                     painter = painterResource(id = R.drawable.ic_time),
                     contentDescription = null,

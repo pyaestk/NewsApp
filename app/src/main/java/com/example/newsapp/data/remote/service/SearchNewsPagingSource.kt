@@ -3,9 +3,9 @@ package com.example.newsapp.data.remote.service
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.newsapp.domain.model.Article
-import com.example.newsapp.util.Contants.API_KEY
 
-class NewsPagingSource(
+class SearchNewsPagingSource(
+    private val searchQuery: String,
     private val newsApi: NewsApi,
     private val sources: String
 ): PagingSource<Int, Article>() {
@@ -23,7 +23,7 @@ class NewsPagingSource(
         val page = params.key ?: 1
         return try {
 
-            val newsResponse = newsApi.getNews(sources = sources, page = page)
+            val newsResponse = newsApi.searchNews(sources = sources, page = page, searchQuery = searchQuery)
 
             totalNewsCount += newsResponse.articles.size
 
@@ -42,6 +42,4 @@ class NewsPagingSource(
             )
         }
     }
-
-
 }

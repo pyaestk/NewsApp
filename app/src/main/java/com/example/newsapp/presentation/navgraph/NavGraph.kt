@@ -12,6 +12,8 @@ import com.example.newsapp.presentation.home.HomeScreen
 import com.example.newsapp.presentation.home.HomeViewModel
 import com.example.newsapp.presentation.onboarding.OnBoardingScreen
 import com.example.newsapp.presentation.onboarding.OnBoardingViewModel
+import com.example.newsapp.presentation.search.SearchScreen
+import com.example.newsapp.presentation.search.SearchViewModel
 
 @Composable
 fun NavGraph(
@@ -23,12 +25,11 @@ fun NavGraph(
     NavHost(navController = navController, startDestination = startDestination) {
 
         navigation(
-            route = Route.AppStartNavigation.route,
-            startDestination = Route.OnBoardingScreen.route
-        ){
+            route = Route.AppStartNavigation.route, startDestination = Route.OnBoardingScreen.route
+        ) {
             composable(
                 route = Route.OnBoardingScreen.route
-            ){
+            ) {
                 val viewModel: OnBoardingViewModel = hiltViewModel()
                 OnBoardingScreen(
                     event = viewModel::onEvent
@@ -37,20 +38,30 @@ fun NavGraph(
 
         }
 
+
         navigation(
-            route = Route.NewsNavigation.route,
-            startDestination = Route.NewsNavigatorScreen.route
-        ){
+            route = Route.NewsNavigation.route, startDestination = Route.NewsNavigatorScreen.route
+        ) {
             composable(
-                route = Route.NewsNavigatorScreen.route
-            ){
+                route = Route.NewsNavigatorScreen.route // Represents the HomeScreen
+            ) {
                 val viewModel: HomeViewModel = hiltViewModel()
                 val articles = viewModel.news.collectAsLazyPagingItems()
                 HomeScreen(
                     articles = articles,
-                    navigate = {
-
+                    navigate = { route ->
+                        navController.navigate(route)
                     }
+                )
+            }
+            composable(
+                route = Route.SearchScreen.route
+            ) {
+                val viewModel: SearchViewModel = hiltViewModel()
+                SearchScreen(
+                    state = viewModel.state.value,
+                    event = viewModel::onEvent,
+                    navigate = {}
                 )
             }
 
