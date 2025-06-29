@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.paging.LoadState
@@ -15,27 +17,46 @@ import com.example.newsapp.presentation.Dimens
 import com.loc.newsapp.presentation.common.EmptyScreen
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticlesList(
     modifier: Modifier = Modifier,
     articles: LazyPagingItems<Article>,
-    onClick: (Article) -> Unit
+    onClick: (Article) -> Unit,
+    isRefreshing: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
 ) {
-    val handlePagingResource = handlePagingResult(articles)
-    if (handlePagingResource){
+    if (onRefresh != null) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = modifier
+        ) {
+            ListContent(articles, onClick, modifier, onRefresh)
+        }
+    } else {
+
+        ListContent(articles, onClick, modifier, onRefresh)
+    }
+}
+
+@Composable
+private fun ListContent(
+    articles: LazyPagingItems<Article>,
+    onClick: (Article) -> Unit,
+    modifier: Modifier = Modifier,
+    onRefresh: (() -> Unit)? = null
+) {
+    val handlePagingResource = handlePagingResult(articles, onRefresh)
+    if (handlePagingResource) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Dimens.MediumPadding1),
             contentPadding = PaddingValues(all = Dimens.ExtraSmallPadding2)
         ) {
             items(count = articles.itemCount) {
                 articles[it]?.let { article ->
-                    ArticleCard(
-                        article = article,
-                        onClick = {
-                            onClick(article)
-                        }
-                    )
+                    ArticleCard(article = article, onClick = { onClick(article) })
                 }
             }
         }
@@ -44,7 +65,33 @@ fun ArticlesList(
 
 
 @Composable
-fun handlePagingResult(articles: LazyPagingItems<Article>): Boolean{
+fun ArticlesList(
+    modifier: Modifier = Modifier,
+    articles: List<Article>,
+    onClick: (Article) -> Unit
+) {
+
+    if (articles.isEmpty()){
+        EmptyScreen()
+    }
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(Dimens.MediumPadding1),
+        contentPadding = PaddingValues(all = Dimens.ExtraSmallPadding2)
+    ) {
+        items(count = articles.size) {
+            val article = articles[it]
+            ArticleCard(article = article, onClick = { onClick(article) })
+        }
+    }
+}
+
+
+@Composable
+fun handlePagingResult(
+    articles: LazyPagingItems<Article>,
+    onRefresh: (() -> Unit)? = null
+): Boolean{
     val loadState = articles.loadState
     val error = when{
         loadState.refresh is LoadState.Error -> {
@@ -64,15 +111,15 @@ fun handlePagingResult(articles: LazyPagingItems<Article>): Boolean{
             ShimmerEffect()
             false
         }
-
         error != null -> {
-            EmptyScreen()
+            EmptyScreen(error = error, onRefresh = onRefresh)
             false
         }
-
+        articles.itemCount < 1 -> {
+            EmptyScreen(onRefresh = onRefresh)
+            false
+        }
         else -> true
-
-
     }
 }
 
@@ -84,7 +131,7 @@ private fun ShimmerEffect(){
     ) {
         repeat(10) {
             ArticleCardShimmerEffect(
-                modifier = Modifier.padding(horizontal = Dimens.MediumPadding1)
+                modifier = Modifier
             )
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -46,13 +47,18 @@ fun ArticleCard(
 
     val context = LocalContext.current
     Row(
-        modifier = modifier.clickable {}
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick?.invoke() }
     ) {
         AsyncImage(
             modifier = Modifier
                 .size(ArticleCardSize)
                 .clip(MaterialTheme.shapes.medium),
-            model = ImageRequest.Builder(context).data(article.urlToImage).build(),
+            model = ImageRequest
+                .Builder(context)
+                .data(article.urlToImage)
+                .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )
@@ -71,8 +77,6 @@ fun ArticleCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
-
 
             Text(
                 modifier = Modifier.padding(horizontal = 6.dp),

@@ -1,5 +1,6 @@
 package com.example.newsapp.presentation.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Column
@@ -20,18 +21,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.newsapp.R
 import com.example.newsapp.domain.model.Article
 import com.example.newsapp.presentation.Dimens
 import com.example.newsapp.presentation.common.ArticlesList
-import com.example.newsapp.presentation.navgraph.Route
 import com.loc.newsapp.presentation.common.SearchBar
 
 @Composable
 fun HomeScreen(
     articles: LazyPagingItems<Article>,
-    navigate: (String) -> Unit
+    navigateToSearch: () -> Unit,
+    navigateToDetails: (Article) -> Unit
 ) {
     val titles by remember {
         derivedStateOf {
@@ -46,6 +48,8 @@ fun HomeScreen(
             }
         }
     }
+
+    val isRefreshing = articles.loadState.refresh is LoadState.Loading
 
     Column(
         modifier = Modifier
@@ -72,7 +76,7 @@ fun HomeScreen(
             text = "",
             readOnly = true,
             onValueChange = {},
-            onClick = { navigate(Route.SearchScreen.route) },
+            onClick = { navigateToSearch() },
             onSearch = {}
         )
 
@@ -90,9 +94,15 @@ fun HomeScreen(
         Spacer(modifier = Modifier.padding(top = Dimens.MediumPadding1))
 
         ArticlesList(
-            articles = articles, onClick = {
-                navigate(Route.DetailsScreen.route)
-            })
+            modifier = Modifier,
+            articles = articles,
+            onClick = {
+                Log.d("TAG", "Article: $it")
+                navigateToDetails(it)
+            },
+            isRefreshing = isRefreshing,
+            onRefresh = { articles.refresh() }
+        )
 
     }
 
